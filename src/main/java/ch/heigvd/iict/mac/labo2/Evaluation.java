@@ -123,7 +123,12 @@ public class Evaluation {
         ///
         // TODO student: compare Analyzers here i.e. change analyzer to
         // the asked analyzers once the metrics have been implemented
-        analyzer = new EnglishAnalyzer(new CharArraySet(commonWords, true));
+
+        analyzer = new WhitespaceAnalyzer();
+        //analyzer = new StandardAnalyzer();
+        //analyzer = new EnglishAnalyzer();
+        //analyzer = new EnglishAnalyzer(new CharArraySet(commonWords, true));
+        
 
 
         ///
