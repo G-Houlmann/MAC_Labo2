@@ -3,8 +3,6 @@ package ch.heigvd.iict.mac.labo2;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -12,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class Evaluation {
@@ -167,22 +166,35 @@ public class Evaluation {
 
             int retrievedDocs = queryResults.size();
             int relevantDocs = qrelResults.size();
-            long retrievedRelevantDocs = queryResults.stream().filter(qrelResults::contains).count();
+//            long retrievedRelevantDocs = queryResults.stream().filter(qrelResults::contains).count();
+
+            // Compute the recalls/precisions for all positions in the current query
+            double[] recalls = new double[retrievedDocs];
+            double[] precisions = new double[retrievedDocs];
+
+            int retrievedRelevantDocs = 0;
+            int i = 0;
+            for (Integer r : queryResults) {
+                if (qrelResults.contains(r)) ++retrievedRelevantDocs;
+                double rec = (double) retrievedRelevantDocs / totalRelevantDocs;
+                recalls[i] = rec;
+                precisions[i] = (double) retrievedRelevantDocs / (i + 1);
+                ++i;
+            }
 
             totalRetrievedDocs += retrievedDocs;
             totalRelevantDocs += relevantDocs;
             totalRetrievedRelevantDocs += retrievedRelevantDocs;
 
-            double precision = retrievedRelevantDocs / retrievedDocs;
-            double recall = retrievedRelevantDocs / relevantDocs;
-            double RPrecision = retrievedRelevantDocs / relevantDocs;
+            double precision = (double) retrievedRelevantDocs / retrievedDocs;
+            double recall = (double) retrievedRelevantDocs / relevantDocs;
+            double RPrecision = (double) retrievedRelevantDocs / relevantDocs;
+            double AP = Arrays.stream(precisions).sum() / retrievedDocs;
 
-            avgPrecision += (precision - avgPrecision) / (double)queryNumber;
-            avgRecall += (recall - avgRecall) / (double)queryNumber;
-            avgRPrecision += (RPrecision - avgRPrecision) / (double)queryNumber;
-            
-            
-
+            avgPrecision += (precision - avgPrecision) / queryNumber;
+            avgRecall += (recall - avgRecall) / queryNumber;
+            avgRPrecision += (RPrecision - avgRPrecision) / queryNumber;
+            meanAveragePrecision += (AP - meanAveragePrecision) / queryNumber;
         }
 
         fMeasure = (2 * avgRecall * avgPrecision) / (avgRecall + avgPrecision);
