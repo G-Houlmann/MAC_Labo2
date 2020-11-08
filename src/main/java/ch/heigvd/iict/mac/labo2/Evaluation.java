@@ -175,9 +175,12 @@ public class Evaluation {
 
             double precision = retrievedRelevantDocs / retrievedDocs;
             double recall = retrievedRelevantDocs / relevantDocs;
+            double RPrecision = retrievedRelevantDocs / relevantDocs;
 
             avgPrecision += (precision - avgPrecision) / (double)queryNumber;
             avgRecall += (recall - avgRecall) / (double)queryNumber;
+            avgRPrecision += (RPrecision - avgRPrecision) / (double)queryNumber;
+            
             
 
         }
