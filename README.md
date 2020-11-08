@@ -9,7 +9,7 @@ Authors :
 
 ### Results
 
-The following graph shows the average precision (AP) at the 11 standard recall values for the 4 analyzers:
+The following graph shows the average precision (AP) at the 11 standard recall levels for the 4 analyzers:
 
 - WhitespaceAnalyzer
 - StandardAnalyzer
