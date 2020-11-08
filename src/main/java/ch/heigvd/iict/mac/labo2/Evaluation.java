@@ -161,11 +161,15 @@ public class Evaluation {
         
         for(String query : queries){
             queryNumber++;
+            System.out.println("Analysing query # " + queryNumber);
             List<Integer> queryResults = lab2Index.search(query);
             List<Integer> qrelResults = qrels.get(queryNumber);
 
             int retrievedDocs = queryResults.size();
-            int relevantDocs = qrelResults.size();
+            if(queryNumber == 34){
+                System.out.println("bite");
+            }
+            int relevantDocs = qrelResults != null? qrelResults.size() : 0;
 //            long retrievedRelevantDocs = queryResults.stream().filter(qrelResults::contains).count();
 
             // Compute the recalls/precisions for all positions in the current query
@@ -175,7 +179,7 @@ public class Evaluation {
             int retrievedRelevantDocs = 0;
             int i = 0;
             for (Integer r : queryResults) {
-                if (qrelResults.contains(r)) ++retrievedRelevantDocs;
+                if (qrelResults != null && qrelResults.contains(r)) ++retrievedRelevantDocs;
                 double rec = (double) retrievedRelevantDocs / totalRelevantDocs;
                 recalls[i] = rec;
                 precisions[i] = (double) retrievedRelevantDocs / (i + 1);
