@@ -181,14 +181,21 @@ public class Evaluation {
                 Arrays.fill(recalls, 0.0);
                 Arrays.fill(precisions, 0.0);
             } else {
+                //Compute the Average Precision for this query
                 int pos = 0;
                 for (Integer r : queryResults) {
-                    if (qrelResults.contains(r)) ++retrievedRelevantDocs;
+                    boolean hit = qrelResults.contains(r);
+                    if (hit){
+                        ++retrievedRelevantDocs;
+                    } 
                     recalls[pos] = (double) retrievedRelevantDocs / relevantDocs;
                     precisions[pos] = (double) retrievedRelevantDocs / (pos + 1);
-                    AP += (precisions[pos] - AP) / (pos + 1);
+                    if(hit){
+                        AP += precisions[pos];
+                    }
                     ++pos;
                 }
+                AP /= relevantDocs;
             }
 
             for (int recallLevel  = 0; recallLevel < avgPrecisionAtRecallLevels.length; ++recallLevel) {
@@ -206,7 +213,7 @@ public class Evaluation {
                 avgPrecisionAtRecallLevels[recallLevel] += (interpolatedPrecision - avgPrecisionAtRecallLevels[recallLevel]) / queryNumber;
             }
 
-
+            //Add to totals
             totalRetrievedDocs += retrievedDocs;
             totalRelevantDocs += relevantDocs;
             totalRetrievedRelevantDocs += retrievedRelevantDocs;
