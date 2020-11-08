@@ -216,7 +216,8 @@ public class Evaluation {
             double recall, RPrecision;
             if(relevantDocs != 0){
                 recall = (double) retrievedRelevantDocs / relevantDocs;
-                RPrecision = (double) retrievedRelevantDocs / relevantDocs;
+                long amoutRelevantRetrievedinXFirst = queryResults.stream().limit(relevantDocs).filter(qrelResults::contains).count();
+                RPrecision = (double) amoutRelevantRetrievedinXFirst / relevantDocs;
             }else{
                 recall = RPrecision = 0;
             }
@@ -227,10 +228,10 @@ public class Evaluation {
             avgPrecision += (precision - avgPrecision) / queryNumber;
             avgRecall += (recall - avgRecall) / queryNumber;
             avgRPrecision += (RPrecision - avgRPrecision) / queryNumber;
+            //avgRPrecision += RPrecision;
             meanAveragePrecision += (AP - meanAveragePrecision) / queryNumber;
 
         }
-
 
         fMeasure = (avgRecall + avgPrecision == 0)? 0 : (2 * avgRecall * avgPrecision) / (avgRecall + avgPrecision);
 
