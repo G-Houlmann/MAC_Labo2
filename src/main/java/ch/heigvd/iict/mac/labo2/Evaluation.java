@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class Evaluation {
@@ -157,6 +157,8 @@ public class Evaluation {
         double avgRecall = 0.0;
         double meanAveragePrecision = 0.0;
         double fMeasure = 0.0;
+        // average precision at the 11 recall levels (0,0.1,0.2,...,1) over all queries
+        double[] avgPrecisionAtRecallLevels = createZeroedRecalls();
 
         
         for(String query : queries){
@@ -173,13 +175,24 @@ public class Evaluation {
             double[] precisions = new double[retrievedDocs];
 
             int retrievedRelevantDocs = 0;
-            int i = 0;
+            int pos = 0;
             for (Integer r : queryResults) {
                 if (qrelResults.contains(r)) ++retrievedRelevantDocs;
                 double rec = (double) retrievedRelevantDocs / totalRelevantDocs;
-                recalls[i] = rec;
-                precisions[i] = (double) retrievedRelevantDocs / (i + 1);
-                ++i;
+                recalls[pos] = rec;
+                precisions[pos] = (double) retrievedRelevantDocs / (pos + 1);
+                ++pos;
+            }
+
+            for (int recallLevel  = 0; recallLevel < avgPrecisionAtRecallLevels.length; ++recallLevel) {
+                double interpolatedPrecision = 0;
+                int nbMatchingPrecisions = 0;
+                for (int i = 0; i < retrievedDocs; ++i) {
+                    if (recalls[i] >= recallLevel * (1.0 / avgPrecisionAtRecallLevels.length)) {
+                        interpolatedPrecision += (precisions[i] - interpolatedPrecision) / ++nbMatchingPrecisions;
+                    }
+                }
+                avgPrecisionAtRecallLevels[recallLevel] += (interpolatedPrecision - avgPrecisionAtRecallLevels[recallLevel]) / queryNumber;
             }
 
             totalRetrievedDocs += retrievedDocs;
@@ -201,8 +214,7 @@ public class Evaluation {
 
         
 
-        // average precision at the 11 recall levels (0,0.1,0.2,...,1) over all queries
-        double[] avgPrecisionAtRecallLevels = createZeroedRecalls();
+
 
         ///
         ///  Part IV - Display the metrics
