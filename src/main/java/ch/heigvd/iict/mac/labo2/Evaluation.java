@@ -160,7 +160,6 @@ public class Evaluation {
         // average precision at the 11 recall levels (0,0.1,0.2,...,1) over all queries
         double[] avgPrecisionAtRecallLevels = createZeroedRecalls();
 
-        
         for(String query : queries){
             queryNumber++;
 
@@ -175,7 +174,9 @@ public class Evaluation {
             // Compute the recalls/precisions for all positions in the current query
             double[] recalls = new double[retrievedDocs];
             double[] precisions = new double[retrievedDocs];
+
             int retrievedRelevantDocs = 0;
+            double AP = 0;
             if (qrelResults == null) {
                 Arrays.fill(recalls, 0.0);
                 Arrays.fill(precisions, 0.0);
@@ -183,9 +184,9 @@ public class Evaluation {
                 int pos = 0;
                 for (Integer r : queryResults) {
                     if (qrelResults.contains(r)) ++retrievedRelevantDocs;
-                    double rec = (double) retrievedRelevantDocs / totalRelevantDocs;
-                    recalls[pos] = rec;
+                    recalls[pos] = (double) retrievedRelevantDocs / relevantDocs;
                     precisions[pos] = (double) retrievedRelevantDocs / (pos + 1);
+                    AP += (precisions[pos] - AP) / (pos + 1);
                     ++pos;
                 }
             }
@@ -194,10 +195,11 @@ public class Evaluation {
                 double interpolatedPrecision = 0;
 
                 if (qrelResults != null) {
-                    int nbMatchingPrecisions = 0;
                     for (int i = 0; i < retrievedDocs; ++i) {
-                        if (recalls[i] >= recallLevel * (1.0 / avgPrecisionAtRecallLevels.length)) {
-                            interpolatedPrecision += (precisions[i] - interpolatedPrecision) / ++nbMatchingPrecisions;
+                        if (recalls[i] >= recallLevel * (1.0 / (avgPrecisionAtRecallLevels.length - 1))) {
+                            interpolatedPrecision = Math.max(interpolatedPrecision, precisions[i]);
+                        } else {
+                            break;
                         }
                     }
                 }
@@ -219,7 +221,7 @@ public class Evaluation {
                 recall = RPrecision = 0;
             }
             double precision = (double) retrievedRelevantDocs / retrievedDocs;
-            double AP = Arrays.stream(precisions).sum() / retrievedDocs;
+//            double AP = Arrays.stream(precisions).sum() / retrievedDocs;
 
             //Update the gloval averages
             avgPrecision += (precision - avgPrecision) / queryNumber;
