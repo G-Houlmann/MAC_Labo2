@@ -148,28 +148,26 @@ public class Evaluation {
         //   returned matching a query
         //        List<Integer> qrelResults = qrels.get(queryNumber);
 
-        int i = 1;
+
+        int queryNumber = 0;
+        int totalRelevantDocs = 0;
+        int totalRetrievedDocs = 0;
+        int totalRetrievedRelevantDocs = 0;
+        double avgPrecision = 0.0;
+        double avgRPrecision = 0.0;
+        double avgRecall = 0.0;
+        double meanAveragePrecision = 0.0;
+        double fMeasure = 0.0;
+
+
         for(String query : queries){
-            int queryNumber = i;
+            queryNumber++;
             List<Integer> queryResults = lab2Index.search(query);
             List<Integer> qrelResults = qrels.get(queryNumber);
 
-            int totalRelevantDocs = 0;
-            int totalRetrievedDocs = 0;
-            int totalRetrievedRelevantDocs = 0;
-            double avgPrecision = 0.0;
-            double avgRPrecision = 0.0;
-            double avgRecall = 0.0;
-            double meanAveragePrecision = 0.0;
-            double fMeasure = 0.0;
+            
 
-
-            ++i;
-        }
-
-        
-
-        
+            }
 
         
 
