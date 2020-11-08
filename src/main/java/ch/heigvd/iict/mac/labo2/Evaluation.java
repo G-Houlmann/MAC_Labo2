@@ -1,8 +1,11 @@
 package ch.heigvd.iict.mac.labo2;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -120,7 +123,7 @@ public class Evaluation {
         ///
         // TODO student: compare Analyzers here i.e. change analyzer to
         // the asked analyzers once the metrics have been implemented
-        analyzer = new WhitespaceAnalyzer();
+        analyzer = new EnglishAnalyzer(new CharArraySet(commonWords, true));
 
 
         ///
