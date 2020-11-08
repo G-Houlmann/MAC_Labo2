@@ -159,15 +159,30 @@ public class Evaluation {
         double meanAveragePrecision = 0.0;
         double fMeasure = 0.0;
 
-
+        
         for(String query : queries){
             queryNumber++;
             List<Integer> queryResults = lab2Index.search(query);
             List<Integer> qrelResults = qrels.get(queryNumber);
 
+            int retrievedDocs = queryResults.size();
+            int relevantDocs = qrelResults.size();
+            long retrievedRelevantDocs = queryResults.stream().filter(qrelResults::contains).count();
+
+            totalRetrievedDocs += retrievedDocs;
+            totalRelevantDocs += relevantDocs;
+            totalRetrievedRelevantDocs += retrievedRelevantDocs;
+
+            double precision = retrievedRelevantDocs / retrievedDocs;
+            double recall = retrievedRelevantDocs / relevantDocs;
+
+            avgPrecision += (precision - avgPrecision) / (double)queryNumber;
+            avgRecall += (recall - avgRecall) / (double)queryNumber;
             
 
-            }
+        }
+
+        fMeasure = (2 * avgRecall * avgPrecision) / (avgRecall + avgPrecision);
 
         
 
