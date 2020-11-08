@@ -195,11 +195,10 @@ public class Evaluation {
                 double interpolatedPrecision = 0;
 
                 if (qrelResults != null) {
+                    double step = recallLevel * (1.0 / (avgPrecisionAtRecallLevels.length - 1));
                     for (int i = 0; i < retrievedDocs; ++i) {
-                        if (recalls[i] >= recallLevel * (1.0 / (avgPrecisionAtRecallLevels.length - 1))) {
+                        if (recalls[i] >= step) {
                             interpolatedPrecision = Math.max(interpolatedPrecision, precisions[i]);
-                        } else {
-                            break;
                         }
                     }
                 }
