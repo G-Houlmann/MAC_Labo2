@@ -184,7 +184,7 @@ public class Evaluation {
                 Arrays.fill(recalls, 0.0);
                 Arrays.fill(precisions, 0.0);
             } else {
-                //Compute the Average Precision for this query
+                //Compute the retrieved relevant documents and the Average Precision for this query
                 int pos = 0;
                 for (Integer r : queryResults) {
                     boolean hit = qrelResults.contains(r);
@@ -221,7 +221,7 @@ public class Evaluation {
             totalRelevantDocs += relevantDocs;
             totalRetrievedRelevantDocs += retrievedRelevantDocs;
 
-            //Compute the reecall, RPrecision, precision and Average Precision for this query
+            //Compute the recall, RPrecision, precision and Average Precision for this query
             double recall, RPrecision;
             if(relevantDocs != 0){
                 recall = (double) retrievedRelevantDocs / relevantDocs;
@@ -231,13 +231,11 @@ public class Evaluation {
                 recall = RPrecision = 0;
             }
             double precision = (double) retrievedRelevantDocs / retrievedDocs;
-//            double AP = Arrays.stream(precisions).sum() / retrievedDocs;
 
             //Update the gloval averages
             avgPrecision += (precision - avgPrecision) / queryNumber;
             avgRecall += (recall - avgRecall) / queryNumber;
             avgRPrecision += (RPrecision - avgRPrecision) / queryNumber;
-            //avgRPrecision += RPrecision;
             meanAveragePrecision += (AP - meanAveragePrecision) / queryNumber;
 
         }
