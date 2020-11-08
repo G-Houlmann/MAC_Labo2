@@ -163,16 +163,14 @@ public class Evaluation {
         
         for(String query : queries){
             queryNumber++;
-            System.out.println("Analysing query # " + queryNumber);
+
+            //Get query results and expected results
             List<Integer> queryResults = lab2Index.search(query);
             List<Integer> qrelResults = qrels.get(queryNumber);
 
+            //Compute the retrieved and relevant docs for this query
             int retrievedDocs = queryResults.size();
-            if(queryNumber == 34){
-                System.out.println("bite");
-            }
             int relevantDocs = qrelResults != null? qrelResults.size() : 0;
-//            long retrievedRelevantDocs = queryResults.stream().filter(qrelResults::contains).count();
 
             // Compute the recalls/precisions for all positions in the current query
             double[] recalls = new double[retrievedDocs];
@@ -203,18 +201,27 @@ public class Evaluation {
             totalRelevantDocs += relevantDocs;
             totalRetrievedRelevantDocs += retrievedRelevantDocs;
 
+            //Compute the reecall, RPrecision, precision and Average Precision for this query
+            double recall, RPrecision;
+            if(relevantDocs != 0){
+                recall = (double) retrievedRelevantDocs / relevantDocs;
+                RPrecision = (double) retrievedRelevantDocs / relevantDocs;
+            }else{
+                recall = RPrecision = 0;
+            }
             double precision = (double) retrievedRelevantDocs / retrievedDocs;
-            double recall = (double) retrievedRelevantDocs / relevantDocs;
-            double RPrecision = (double) retrievedRelevantDocs / relevantDocs;
             double AP = Arrays.stream(precisions).sum() / retrievedDocs;
 
+            //Update the gloval averages
             avgPrecision += (precision - avgPrecision) / queryNumber;
             avgRecall += (recall - avgRecall) / queryNumber;
             avgRPrecision += (RPrecision - avgRPrecision) / queryNumber;
             meanAveragePrecision += (AP - meanAveragePrecision) / queryNumber;
+
         }
 
-        fMeasure = (2 * avgRecall * avgPrecision) / (avgRecall + avgPrecision);
+
+        fMeasure = (avgRecall + avgPrecision == 0)? 0 : (2 * avgRecall * avgPrecision) / (avgRecall + avgPrecision);
 
         
 
