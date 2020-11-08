@@ -175,27 +175,36 @@ public class Evaluation {
             // Compute the recalls/precisions for all positions in the current query
             double[] recalls = new double[retrievedDocs];
             double[] precisions = new double[retrievedDocs];
-
             int retrievedRelevantDocs = 0;
-            int pos = 0;
-            for (Integer r : queryResults) {
-                if (qrelResults != null && qrelResults.contains(r)) ++retrievedRelevantDocs;
-                double rec = (double) retrievedRelevantDocs / totalRelevantDocs;
-                recalls[pos] = rec;
-                precisions[pos] = (double) retrievedRelevantDocs / (pos + 1);
-                ++pos;
+            if (qrelResults == null) {
+                Arrays.fill(recalls, 0.0);
+                Arrays.fill(precisions, 0.0);
+            } else {
+                int pos = 0;
+                for (Integer r : queryResults) {
+                    if (qrelResults.contains(r)) ++retrievedRelevantDocs;
+                    double rec = (double) retrievedRelevantDocs / totalRelevantDocs;
+                    recalls[pos] = rec;
+                    precisions[pos] = (double) retrievedRelevantDocs / (pos + 1);
+                    ++pos;
+                }
             }
 
             for (int recallLevel  = 0; recallLevel < avgPrecisionAtRecallLevels.length; ++recallLevel) {
                 double interpolatedPrecision = 0;
-                int nbMatchingPrecisions = 0;
-                for (int i = 0; i < retrievedDocs; ++i) {
-                    if (recalls[i] >= recallLevel * (1.0 / avgPrecisionAtRecallLevels.length)) {
-                        interpolatedPrecision += (precisions[i] - interpolatedPrecision) / ++nbMatchingPrecisions;
+
+                if (qrelResults != null) {
+                    int nbMatchingPrecisions = 0;
+                    for (int i = 0; i < retrievedDocs; ++i) {
+                        if (recalls[i] >= recallLevel * (1.0 / avgPrecisionAtRecallLevels.length)) {
+                            interpolatedPrecision += (precisions[i] - interpolatedPrecision) / ++nbMatchingPrecisions;
+                        }
                     }
                 }
+
                 avgPrecisionAtRecallLevels[recallLevel] += (interpolatedPrecision - avgPrecisionAtRecallLevels[recallLevel]) / queryNumber;
             }
+
 
             totalRetrievedDocs += retrievedDocs;
             totalRelevantDocs += relevantDocs;
