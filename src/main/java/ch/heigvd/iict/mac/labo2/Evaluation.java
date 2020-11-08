@@ -148,15 +148,30 @@ public class Evaluation {
         //   returned matching a query
         //        List<Integer> qrelResults = qrels.get(queryNumber);
 
-        int queryNumber = 0;
-        int totalRelevantDocs = 0;
-        int totalRetrievedDocs = 0;
-        int totalRetrievedRelevantDocs = 0;
-        double avgPrecision = 0.0;
-        double avgRPrecision = 0.0;
-        double avgRecall = 0.0;
-        double meanAveragePrecision = 0.0;
-        double fMeasure = 0.0;
+        int i = 1;
+        for(String query : queries){
+            int queryNumber = i;
+            List<Integer> queryResults = lab2Index.search(query);
+            List<Integer> qrelResults = qrels.get(queryNumber);
+
+            int totalRelevantDocs = 0;
+            int totalRetrievedDocs = 0;
+            int totalRetrievedRelevantDocs = 0;
+            double avgPrecision = 0.0;
+            double avgRPrecision = 0.0;
+            double avgRecall = 0.0;
+            double meanAveragePrecision = 0.0;
+            double fMeasure = 0.0;
+
+
+            ++i;
+        }
+
+        
+
+        
+
+        
 
         // average precision at the 11 recall levels (0,0.1,0.2,...,1) over all queries
         double[] avgPrecisionAtRecallLevels = createZeroedRecalls();
